@@ -154,12 +154,16 @@ HTU21D::getDewPoint(int bSampleData)
         sampleData();
     }
 
-	float fA  = 8.1332;
-	float fB  = 1762.39;
-	float fC  = 235.66;
-	float fT  = getTemperature(false);
-	float fRH = getHumidity(false);
+    float fA  = 8.1332;
+    float fB  = 1762.39;
+    float fC  = 235.66;
+    float fT  = getTemperature(false);
+    float fRH = getHumidity(false);
+#ifdef __ANDROID__
+    float fPP = pow(10, fA - (fB / (fT + fC)));
+#else
     float fPP = exp10(fA - (fB / (fT + fC)));
+#endif
     float fDP = -(fB / (log10(fRH * fPP / 100) - fA) + fC);
 
     return (fDP);
