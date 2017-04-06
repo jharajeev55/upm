@@ -598,12 +598,6 @@ function (UPM_MIXED_MODULE_INIT)
   # Make sure REQUIRES is a list
   separate_arguments(UPM_MIXED_MODULE_INIT_REQUIRES)
 
-  # Always add the common header dirs to the includes list, even if we
-  # end up only building a C++ module. This is needed for cases where
-  # a C++ only driver depends on a mixed C++/C driver.
-  include_directories (${UPM_COMMON_HEADER_DIRS}
-    ${CMAKE_SOURCE_DIR}/src/utilities)
-
   # Always build C libs first
   if (UPM_MIXED_MODULE_INIT_C_SRC)
     set (libname ${UPM_MIXED_MODULE_INIT_NAME})
@@ -632,11 +626,6 @@ function (UPM_MIXED_MODULE_INIT)
       list (REMOVE_ITEM UPM_MIXED_MODULE_INIT_REQUIRES utilities-c)
       list (APPEND UPM_MIXED_MODULE_INIT_REQUIRES utilities)
     endif ()
-
-    # Add include directories for C
-    target_include_directories (${libname} PUBLIC
-        ${UPM_COMMON_HEADER_DIRS}
-        ${CMAKE_SOURCE_DIR}/src/utilities)
 
     ## "export" the logical C lib target for the calling module's
     ## CMakeLists.txt
@@ -691,6 +680,9 @@ function(upm_module_init)
   # Specify the current source directory as an INTERFACE include dir.
   # This allows for transitive header dependencies via target_link_libraries
   target_include_directories(${libname} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+
+  # Also add common header directories to this target
+  target_include_directories (${libname} PUBLIC ${UPM_COMMON_HEADER_DIRS})
 
   # Iterate over all arguments passed to upm_module_init.
   #     1. Add them via target_link_libraries
